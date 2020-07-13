@@ -83,6 +83,8 @@
         }
         Error   = @{
             NotPrivateKey = "RSA algorithm requires a certificate private key (System.Security.Cryptography.AsymmetricAlgorithm) as the secret."
+            NoPrivateKey  = "The certificate does not contain the private key."
+            NotRsa        = "This parameter is only used for RSA algorithm."
             NotJson       = @{
                 Message = "The string '{0}' is not a valid JSON string."
                 Target  = "Claims"
