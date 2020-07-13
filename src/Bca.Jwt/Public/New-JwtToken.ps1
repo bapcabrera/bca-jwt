@@ -79,7 +79,7 @@ function New-JwtToken
         [string] $Audience = "",
         [Parameter(ParameterSetName = "FromSecret", Mandatory = $false)]
         [Parameter(ParameterSetName = "FromCertificate", Mandatory = $false)]
-        [Alias("exp")]
+        [Alias("exp", "val", "Validity", "ValidFor")]
         [int] $Expiration = 3600,
         [Parameter(ParameterSetName = "FromSecret", Mandatory = $false)]
         [Parameter(ParameterSetName = "FromCertificate", Mandatory = $false)]
