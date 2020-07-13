@@ -1,20 +1,58 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# Bca.Jwt
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+## Description
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+_Bca.Jwt_ is a PowerShell module used to interract with _JSON Web Token_ (JWT).
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+It can be used to create new tokens, convert a raw token to an object to check properties, and back to a token.
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+## Disclaimer
+
+- _Bca.Jwt_ has been created to answer my needs, but I provide it to people who may need such a tool.
+- It may contain bugs or lack some features, in this case, feel free to open an issue, and I'll manage it as best as I can.
+- This _GitHub_ repository is not the primary one, see transparency for more information.
+
+## Examples
+
+### Convert a raw token to an object
+
+```ps
+"eyJxxxxx.eyJyyyyyy.zzzzzz" | ConvertFrom-JwtToken
+```
+
+### Convert a token object to raw token
+
+```ps
+$TokenObject = "eyJxxxxx.eyJyyyyyy.zzzzzz" | ConvertFrom-JwtToken
+$TokenObject | ConvertTo-JwtToken
+```
+
+## How to install
+
+### Package
+
+_Bca.Jwt_ is available as a package from _[PowerShell Gallery](https://www.powershellgallery.com/)_, _[NuGet](https://www.nuget.org/)_ and _[Chocolatey](https://chocolatey.org/)_, please refer to each specific plateform on how to install the package.
+
+\* Chocolatey feed may not be up to date as there are manual verifications for each packages.
+
+### Manually
+
+If you decide to install _Bca.Jwt_ manually, copy the content of `src` into one or all of the path(s) contained in the variable `PSModulePath` depending on the scope you need.
+
+I'll advise you use a path with the version, that can be found in the module manifest `psd1` file (e.g. `C:\Program Files\WindowsPowerShell\Modules\Bca.Jwt\1.0.0`). In that case copy the content of `src/Bca.Jwt` in this path.
+
+## Transparency
+
+_Please not that to date I am the only developper for this module._
+
+All code is stored on a private Git repository on Azure DevOps.
+
+When a pull request is submitted, it runs an Azure DevOps build pipeline that tests the module with _[Pester](https://pester.dev/)_ tests and runs the _[PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)_.
+
+Once merged, the build pipeline is run again, but this time it will:
+- Mirror the repository to _GitHub_;
+- Create a Chocolatey and a NuGet packages that are pushed on private Azure DevOps Artifacts feeds.
+
+If the build succeeds and the packages are well pushed, an Azure DevOps release pipeline is trigerred that will:
+- In a **Prerelease** step, install both Chocolatey and Nuget packages from the private feed, and run tests again. If tests are successful, the packages are promoted to `@Prerelease` view inside the private feed;
+- In a **Release** step, publish the packages to _[NuGet](https://www.nuget.org/)_ and _[Chocolatey](https://chocolatey.org/)_, and publish the module to _[PowerShell Gallery](https://www.powershellgallery.com/)_, then promote the packages to to `@PRelease` view inside the private feed.
