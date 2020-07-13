@@ -7,15 +7,20 @@ function New-JwtToken
             Creates a JWT token.
         .PARAMETER Algorithm
             A string containing the algorithm to use.
+        .PARAMETER Type
+            A string containing the token type.
         .PARAMETER Issuer
             A string containing the issuer to use.
+        .PARAMETER Subject
+            A string containing the subject to use.
         .PARAMETER Audience
             A string containing the audience to use.
         .PARAMETER Expiration
             An integer representing the number of seconds for which the token will be valid.
         .PARAMETER Claims
-            An object, hastable or JSON string representing the claims to add or set.
+            An object, hastable or JSON string representing the claims to add or set to the header (based on reserved header claims) or payload.
             If a claim was already set using a parameter, it will be overriden.
+            If algorithm (alg) is specified throught a claim, it will be ignored. Algorithm must be set by Algorithm parameter.
         .PARAMETER Secret
             A string, secure string or certificate private key (for RSA) used to sign the token.
         .OUTPUTS
@@ -44,7 +49,11 @@ function New-JwtToken
         [ValidateSet("HS256", "HS384", "HS512", "RS256", "RS384", "RS512")]
         [string] $Algorithm,
         [Parameter(Mandatory = $false)]
+        [string] $Type = "JWT",
+        [Parameter(Mandatory = $false)]
         [string] $Issuer = "",
+        [Parameter(Mandatory = $false)]
+        [string] $Subject = "",
         [Parameter(Mandatory = $false)]
         [string] $Audience = "",
         [Parameter(Mandatory = $false)]
@@ -53,7 +62,9 @@ function New-JwtToken
         $Claims,
         [Parameter(Mandatory = $true)]
         [ValidateScript( { if (($Algorithm -like "RS*") -and ($_.GetType().FullName -ne "System.Security.Cryptography.AsymmetricAlgorithm")) { throw $script:LocalizedData.NewJwtToken.Error.NotPrivateKey } else { $true } })]
-        $Secret
+        $Secret,
+        [Parameter(Mandatory = $false)]
+        [string] $KeyId = ""
     )
 
     begin
@@ -67,8 +78,10 @@ function New-JwtToken
             Write-Debug ($script:LocalizedData.NewJwtToken.Debug.BuildHeader -f $Algorithm)
             $Header = @{
                 alg = $Algorithm;
-                typ = "JWT"
+                typ = $Type
             }
+            
+            if ($KeyId) { $Header.Add("kid", $KeyId) }
 
             Write-Debug ($script:LocalizedData.NewJwtToken.Debug.BuildExpiration -f $Expiration)
             $Expiry = Get-Date "$((Get-Date).AddSeconds($Expiration).ToUniversalTime())" -Uformat %s
@@ -76,10 +89,12 @@ function New-JwtToken
             
             Write-Debug $script:LocalizedData.NewJwtToken.Debug.BuildPayload
             $Payload = @{
-                iss = $Issuer;
-                aud = $Audience;
                 exp = $Expiry
             }
+            
+            if ($Issuer) { $Payload.Add("iss", $Issuer) }
+            if ($Subject) { $Payload.Add("sub", $Subject) }
+            if ($Audience) { $Payload.Add("aud", $Audience) }
             
             if ($Claims)
             {
@@ -93,9 +108,14 @@ function New-JwtToken
                     }
                     default { $Claims = $Claims | ConvertTo-Json -Compress | ConvertFrom-Json }
                 }
-                $Claims | Get-Member -MemberType NoteProperty | Where-Object { $Claims."$($_.Name)" } | ForEach-Object {
+                $Claims | Get-Member -MemberType NoteProperty | Where-Object { $Claims."$($_.Name)" -and ($_.Name -ne "alg") } | ForEach-Object {
                     $CurrentClaim = $_
                     Write-Verbose ($script:LocalizedData.NewJwtToken.Verbose.AddClaim -f $CurrentClaim.Name, $Claims."$($CurrentClaim.Name)")
+                    if ($CurrentClaim.Name -in $Script:TokenHeaderClaims) 
+                    {
+                        if ($Header.Keys -contains $CurrentClaim.Name) { $Header[$CurrentClaim.Name] = $Claims."$($CurrentClaim.Name)" }
+                        else { $Header.Add($CurrentClaim.Name, $Claims."$($CurrentClaim.Name)") }
+                    }
                     if ($Payload.Keys -contains $CurrentClaim.Name) { $Payload[$CurrentClaim.Name] = $Claims."$($CurrentClaim.Name)" }
                     else { $Payload.Add($CurrentClaim.Name, $Claims."$($CurrentClaim.Name)") }
                 }
