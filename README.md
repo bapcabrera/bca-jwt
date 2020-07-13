@@ -4,7 +4,7 @@
 
 _Bca.Jwt_ is a PowerShell module used to interract with _JSON Web Token_ (JWT).
 
-It can be used to create new tokens, convert a raw token to an object to check properties, and back to a token.
+It can be used to create new tokens, test tokens, convert a raw token to an object to check properties, and back to a token.
 
 ## Disclaimer
 
