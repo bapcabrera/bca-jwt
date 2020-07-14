@@ -82,7 +82,9 @@
             AddClaim = "Paramétrage de la demande « {0} » avec la valeur « {1} »."
         }
         Error   = @{
-            NotPrivateKey = "L'algoritme RSA requiert que le secret soit la clé privée du certificat (System.Security.Cryptography.AsymmetricAlgorithm)."
+            NotPrivateKey = "L'algoritme RSA requiert que le secret soit la clé privée du certificat."
+            NoPrivateKey  = "Le certificat ne contient pas la clé privée."
+            NotRsa        = "Ce paramètre est seulement utilisé pour l'algoritme RSA."
             NotJson       = @{
                 Message = "La chaine de charactères « {0} » n'est pas un JSON valide."
                 Target  = "Demandes"
