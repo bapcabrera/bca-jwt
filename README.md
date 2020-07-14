@@ -48,7 +48,7 @@ I'll advise you use a path with the version, that can be found in the module man
 
 _Please not that to date I am the only developper for this module._
 
-All code is stored on a private Git repository on Azure DevOps.
+All code is stored on a private Git repository on Azure DevOps. Issues opened in GitHub create a bug in Azure DevOps.
 
 When a pull request is submitted, it runs an Azure DevOps build pipeline that tests the module with _[Pester](https://pester.dev/)_ tests and runs the _[PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)_.
 
