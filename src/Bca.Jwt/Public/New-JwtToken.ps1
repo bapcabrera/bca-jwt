@@ -194,7 +194,7 @@ function New-JwtToken
             Write-Debug ($script:LocalizedData.NewJwtToken.Debug.HeaderToBase64 -f $EncodedHeader)
             Write-Debug ($script:LocalizedData.NewJwtToken.Debug.PayloadToBase64 -f $EncodedPayload)
 
-            $ToBeSigned = "$EncodedHeader.$EncodedPayload"
+            $ToBeSigned = [System.Text.Encoding]::ASCII.GetBytes("$EncodedHeader.$EncodedPayload")
 
             $SigningAlgorithm = switch ($Algorithm)
             {
@@ -211,11 +211,11 @@ function New-JwtToken
                 "HS"
                 {
                     $SigningAlgorithm.Key = [System.Text.Encoding]::ASCII.GetBytes($Secret)
-                    $Signature = $SigningAlgorithm.ComputeHash([System.Text.Encoding]::ASCII.GetBytes($ToBeSigned))
+                    $Signature = $SigningAlgorithm.ComputeHash($ToBeSigned)
                 }
                 "RS"
                 {
-                    $Signature = $Secret.SignData([System.Text.Encoding]::ASCII.GetBytes($ToBeSigned), $SigningAlgorithm, [Security.Cryptography.RSASignaturePadding]::Pkcs1)
+                    $Signature = $Secret.SignData($ToBeSigned, $SigningAlgorithm, [Security.Cryptography.RSASignaturePadding]::Pkcs1)
                 }
             }
             
