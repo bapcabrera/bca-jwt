@@ -82,7 +82,7 @@
             AddClaim = "Setting claim '{0}' with value '{1}'."
         }
         Error   = @{
-            NotPrivateKey = "RSA algorithm requires a certificate private key (System.Security.Cryptography.AsymmetricAlgorithm) as the secret."
+            NotPrivateKey = "RSA algorithm requires a certificate private key as the secret."
             NoPrivateKey  = "The certificate does not contain the private key."
             NotRsa        = "This parameter is only used for RSA algorithm."
             NotJson       = @{

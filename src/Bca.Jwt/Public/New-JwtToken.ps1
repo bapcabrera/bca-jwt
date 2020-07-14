@@ -38,7 +38,9 @@ function New-JwtToken
             -----------
             This example will return a string containing the token.
         .EXAMPLE
-            New-JwtToken -Algorithm RS256 -Claims @{ iss = $TokenIssuer ; aud = $TokenAudience } -Expiration 3600 -Secret $Cert.PrivateKey
+            $Cert = Get-ChildItem Cert:\LocalMachine\my\CERTIFICATETHUMBPRINT
+            $PrivateKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($Cert)
+            New-JwtToken -Algorithm RS256 -Claims @{ iss = $TokenIssuer ; aud = $TokenAudience } -Expiration 3600 -Secret $PrivateKey
 
             Description
             -----------
@@ -86,26 +88,27 @@ function New-JwtToken
         [Alias("c")]
         $Claims,
         [Parameter(ParameterSetName = "FromSecret", Mandatory = $true)]
-        [ValidateScript({
-            if (($Algorithm -like "RS*") -and ($_.GetType().FullName -ne "System.Security.Cryptography.AsymmetricAlgorithm")) { throw $script:LocalizedData.NewJwtToken.Error.NotPrivateKey }
-            else { $true }
-        })]
+        [ValidateScript( {
+                if (($Algorithm -like "RS*") -and ($_.GetType().FullName -notin "System.Security.Cryptography.AsymmetricAlgorithm", "System.Security.Cryptography.RSACng")) { throw $script:LocalizedData.NewJwtToken.Error.NotPrivateKey }
+                else { $true }
+            })]
         [Alias("sec", "key", "pk")]
         $Secret,
         [Parameter(ParameterSetName = "FromSecret", Mandatory = $false)]
+        [Parameter(ParameterSetName = "FromCertificate", Mandatory = $false)]
         [Alias("kid")]
         [string] $KeyId = "",
         [Parameter(ParameterSetName = "FromCertificate", Mandatory = $true)]
-        [ValidateScript({
-            if ($Algorithm -like "RS*")
-            { 
-                if (!$_.PrivateKey) { throw $script:LocalizedData.NewJwtToken.Error.NoPrivateKey }
-                else { $true }
-            }
-            else { throw $script:LocalizedData.NewJwtToken.Error.NotRsa }
-        })]
+        [ValidateScript( {
+                if ($Algorithm -like "RS*")
+                { 
+                    if (!([System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($_))) { throw $script:LocalizedData.NewJwtToken.Error.NoPrivateKey }
+                    else { $true }
+                }
+                else { throw $script:LocalizedData.NewJwtToken.Error.NotRsa }
+            })]
         [Alias("cert")]
-        [X509Certificate2] $Certificate
+        [System.Security.Cryptography.X509Certificates.X509Certificate2] $Certificate
     )
 
     begin
@@ -117,7 +120,7 @@ function New-JwtToken
         try
         {
             Write-Debug ($script:LocalizedData.NewJwtToken.Debug.BuildHeader -f $Algorithm)
-            $Header = @{
+            $Header = [ordered ]@{
                 alg = $Algorithm;
                 typ = $Type
             }
@@ -125,7 +128,7 @@ function New-JwtToken
             if ($KeyId) { $Header.Add("kid", $KeyId) }
             if ($PSCmdlet.ParameterSetName -eq "FromCertificate")
             {
-                $Secret = $Certificate.PrivateKey
+                $Secret = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($Certificate)
                 $Header.Add("x5t", [Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($Certificate.Thumbprint)).Split('=')[0].Replace('+', '-').Replace('/', '_'))
             }
 
@@ -212,7 +215,7 @@ function New-JwtToken
                 }
                 "RS"
                 {
-                    $Signature = $Secret.SignData($ToBeSigned, $SigningAlgorithm, [Security.Cryptography.RSASignaturePadding]::Pkcs1)
+                    $Signature = $Secret.SignData([System.Text.Encoding]::ASCII.GetBytes($ToBeSigned), [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pkcs1)
                 }
             }
             
