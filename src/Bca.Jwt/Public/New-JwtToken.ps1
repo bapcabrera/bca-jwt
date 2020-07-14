@@ -215,7 +215,7 @@ function New-JwtToken
                 }
                 "RS"
                 {
-                    $Signature = $Secret.SignData([System.Text.Encoding]::ASCII.GetBytes($ToBeSigned), [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pkcs1)
+                    $Signature = $Secret.SignData([System.Text.Encoding]::ASCII.GetBytes($ToBeSigned), $SigningAlgorithm, [Security.Cryptography.RSASignaturePadding]::Pkcs1)
                 }
             }
             
