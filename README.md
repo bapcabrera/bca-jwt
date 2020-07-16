@@ -55,25 +55,25 @@ I'll advise you use a path with the version, that can be found in the module man
 
 _Please not that to date I am the only developper for this module._
 
-All code is primarily stored on a private Git repository on Azure DevOps.
-
-Issues opened in GitHub create a bug in Azure DevOps.
-
-All pushes made in GitHub are synced on Azure DevOps (that includes all branches except `master`).
-
-When a GitHub Pull Request is submitted, it is analyzed and merged in `develop` on GitHub ans synced to Azure DevOps that will run the CI.
-
-When a Pull Request is submitted in Azure DevOps to merge `develop` to `master`, it runs the CI.
-
-Once merged to `master`, the CI is run again, but this time it will:
-- Mirror the repository to _GitHub_;
-- Create a Chocolatey and a NuGet packages that are pushed on private Azure DevOps Artifacts feeds.
-
-If the CI succeeds and the packages are well pushed, the CD is triggered.
+- All code is primarily stored on a private Git repository on Azure DevOps;
+- Issues opened in GitHub create a bug in Azure DevOps;
+- All pushes made in GitHub are synced to Azure DevOps (that includes all branches except `master`);
+- When a GitHub Pull Request is submitted, it is analyzed and merged in `develop` on GitHub, then synced to Azure DevOps that will trigger the CI;
+- A Pull Request is then submitted in Azure DevOps to merge `develop` to `master`, it runs the CI again;
+- Once merged to `master`, the CI is one last time, but this time it will create a Chocolatey and a NuGet packages that are pushed on private Azure DevOps Artifacts feeds;
+- If the CI succeeds and the packages are well pushed, the CD is triggered.
 
 ### CI
 
-The CI is an Azure DevOps build pipeline that tests the module with _[Pester](https://pester.dev/)_ tests and runs the _[PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)_.
+The CI is an Azure DevOps build pipeline that will:
+- Test the module with _[Pester](https://pester.dev/)_ tests;
+- Run the _[PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)_;
+- Mirror the repository to GitHub
+
+| Branch       | Status  |
+| ------------ | ------- |
+| `master`     | [![Build status](https://dev.azure.com/baptistecabrera/Bca/_apis/build/status/Bca.Jwt?branchName=master)](https://dev.azure.com/baptistecabrera/Bca/_build/latest?definitionId=4?branchName=master) |
+| `develop`    | [![Build status](https://dev.azure.com/baptistecabrera/Bca/_apis/build/status/Bca.Jwt?branchName=develop)](https://dev.azure.com/baptistecabrera/Bca/_build/latest?definitionId=4?branchName=develop) |
 
 ### CD
 
