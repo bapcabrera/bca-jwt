@@ -1,5 +1,6 @@
 # New-JwtToken
 Type: Function
+
 Module: [Bca.Jwt](../ReadMe.md)
 
 Creates a JWT token.
@@ -164,6 +165,7 @@ Using a certificate implicitely adds the claim 'x5t' (Base64 encoded thumbprint 
 
 ## Outputs
 **System.String**
+
 Returns a String containing the raw token.
 ## Related Links
 - [https://tools.ietf.org/html/rfc7519](https://tools.ietf.org/html/rfc7519)

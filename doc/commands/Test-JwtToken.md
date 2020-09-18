@@ -1,5 +1,6 @@
 # Test-JwtToken
 Type: Function
+
 Module: [Bca.Jwt](../ReadMe.md)
 
 Tests a JWT token vailidty.
@@ -22,6 +23,7 @@ A string containing the raw JWT token.
 
 ## Outputs
 **System.Boolean**
+
 Returns a Boolean specifying if the token is valide.
 ## Related Links
 - [https://tools.ietf.org/html/rfc7519](https://tools.ietf.org/html/rfc7519)

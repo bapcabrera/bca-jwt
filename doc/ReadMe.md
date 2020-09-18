@@ -1,5 +1,6 @@
 # Bca.Jwt `0.1.0`
 Tags: `jsonwebtoken` `jwt` `jwttoken` `Linux` `MacOS` `token` `Windows`
+
 Minimum PowerShell version: `5.1`
 
 Module to manage JWT tokens.

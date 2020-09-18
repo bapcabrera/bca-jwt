@@ -1,5 +1,6 @@
 # ConvertFrom-JwtToken
 Type: Function
+
 Module: [Bca.Jwt](../ReadMe.md)
 
 Converts a JWT token string.
@@ -62,9 +63,11 @@ This parameter has no effect if AsJson is specified.
 
 ## Inputs
 **System.String**
+
 You can pipe a value for the raw token to this cmdlet.
 ## Outputs
 **System.Management.Automation.PSCustomObject**
+
 Returns a PSCustomObject containing a description of the token.
 ## Notes
 Signature is kept raw but padded, so it can be offuscated if needed.
