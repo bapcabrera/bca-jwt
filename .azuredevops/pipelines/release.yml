@@ -14,7 +14,7 @@ parameters:
 - name: gitHubPub
   displayName: Publish to GitHub Packages
   type: boolean
-  default: false
+  default: true
 - name: testWindows
   displayName: Test on Windows
   type: boolean
