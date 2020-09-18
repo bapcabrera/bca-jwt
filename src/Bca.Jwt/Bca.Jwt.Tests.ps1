@@ -21,14 +21,47 @@ Describe $global:TestLocalizedData.Module.Describe {
     }
 }
 
+Describe $global:TestLocalizedData.Token.Describe -Tags "WindowsOnly" {
+    
+    BeforeAll {
+        $TokenIssuer = "Bca"
+        $TokenAudience = "Everyone"
+        $Policies = [System.Security.Cryptography.CngExportPolicies]::AllowPlaintextExport, [System.Security.Cryptography.CngExportPolicies]::AllowExport
+        $Certificate = New-SelfSignedCertificate -CertStoreLocation Cert:\CurrentUser\My\ -HashAlgorithm "SHA256" -KeyLength 2048 -KeyAlgorithm RSA -KeyUsage DigitalSignature -KeyExportPolicy $Policies -Subject "BcaJwt"
+        $PrivateKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($Certificate)
+        $Secret = "shush!"
+    }
+
+    It $global:TestLocalizedData.Token.NewRS256Cert {
+        try
+        {
+            $Result = $true
+            $Certificate = New-SelfSignedCertificate -CertStoreLocation Cert:\CurrentUser\My\ -HashAlgorithm "SHA256" -KeyLength 2048 -KeyAlgorithm RSA -KeyUsage DigitalSignature -KeyExportPolicy $Policies -Subject "BcaJwt"
+            $Token = New-JwtToken -Algorithm RS256 -Issuer $TokenIssuer -Audience $TokenAudience -Certificate $Certificate
+        }
+        catch { $Result = $false }
+        $Result | Should -Be $true
+        $Token | Should -Not -Be ""
+    }
+    
+    It $global:TestLocalizedData.Token.NewRS256PrivateKey {
+        try
+        {
+            $Result = $true
+            $Certificate = New-SelfSignedCertificate -CertStoreLocation Cert:\CurrentUser\My\ -HashAlgorithm "SHA256" -KeyLength 2048 -KeyAlgorithm RSA -KeyUsage DigitalSignature -KeyExportPolicy $Policies -Subject "BcaJwt"
+            $PrivateKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($Certificate)
+            $Token = New-JwtToken -Algorithm RS256 -Issuer $TokenIssuer -Audience $TokenAudience -Secret $PrivateKey
+        }
+        catch { $Result = $false }
+        $Result | Should -Be $true
+        $Token | Should -Not -Be ""
+    }
+}    
 Describe $global:TestLocalizedData.Token.Describe {
     
     BeforeAll {
         $TokenIssuer = "Bca"
         $TokenAudience = "Everyone"
-        $policies = [System.Security.Cryptography.CngExportPolicies]::AllowPlaintextExport, [System.Security.Cryptography.CngExportPolicies]::AllowExport
-        $Certificate = New-SelfSignedCertificate -CertStoreLocation Cert:\CurrentUser\My\ -HashAlgorithm "SHA256" -KeyLength 2048 -KeyAlgorithm RSA -KeyUsage DigitalSignature -KeyExportPolicy $Policies -Subject "BcaJwt"
-        $PrivateKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($Certificate)
         $Secret = "shush!"
     }
     
@@ -42,23 +75,12 @@ Describe $global:TestLocalizedData.Token.Describe {
         $Result | Should -Be $true
         $Token | Should -Not -Be ""
     }
-    
-    It $global:TestLocalizedData.Token.NewRS256Cert {
+
+    It $global:TestLocalizedData.Token.NewHS256Claims {
         try
         {
             $Result = $true
-            $Token = New-JwtToken -Algorithm RS256 -Issuer $TokenIssuer -Audience $TokenAudience -Certificate $Certificate
-        }
-        catch { $Result = $false }
-        $Result | Should -Be $true
-        $Token | Should -Not -Be ""
-    }
-    
-    It $global:TestLocalizedData.Token.NewRS256PrivateKey {
-        try
-        {
-            $Result = $true
-            $Token = New-JwtToken -Algorithm RS256 -Issuer $TokenIssuer -Audience $TokenAudience -Secret $PrivateKey
+            $Token = New-JwtToken -Algorithm HS256 -Claims @{ iss = $TokenIssuer; aud = $TokenAudience } -Secret $Secret
         }
         catch { $Result = $false }
         $Result | Should -Be $true
