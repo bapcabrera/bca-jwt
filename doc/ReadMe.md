@@ -17,6 +17,7 @@ Module to manage JWT tokens.
 - ConvertFrom-JwtToken: Function to convert a raw JWT token to an object;
 - ConvertTo-JwtToken: Function to convert a token object to raw JWT token;
 - Test-JwtToken: Function to test is a jwt token is structuraly valid;
-- Support English and French.
+- Supports Windows, Linux and MacOS;
+- Supports English and French language.
 ---
 [Bca.Jwt](https://github.com/baptistecabrera/bca-jwt)
